@@ -47,8 +47,11 @@ export default function BakeryVideo({
   }, [onEnded]);
 
   const handleCanPlay = useCallback(() => {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = 2.0;
+    }
     onCanPlay();
-  }, [onCanPlay]);
+  }, [onCanPlay, videoRef]);
 
   const handleError = useCallback(() => {
     if (endedCalledRef.current) return;

@@ -5,12 +5,12 @@ import gsap from "gsap";
 
 // Panel visual data — each panel has its own subtle colour and depth character
 const PANEL_DATA = [
-  { num: "01", bg: "#FFF8EF", shadow: "inset 1px 0 0 rgba(255,255,255,0.4), inset -1px 0 20px rgba(200,161,90,0.02)", xPercent: -105, rotate: -1 },
-  { num: "02", bg: "#FFF6EE", shadow: "inset 1px 0 0 rgba(255,255,255,0.4), inset -1px 0 20px rgba(200,161,90,0.02)", xPercent: -100, rotate: -0.5 },
-  { num: "03", bg: "#FDF2EA", shadow: "inset 1px 0 0 rgba(255,255,255,0.4), inset -1px 0 20px rgba(200,161,90,0.02)", xPercent: -102, rotate: 0 },
-  { num: "04", bg: "#FFF9F3", shadow: "inset 1px 0 0 rgba(255,255,255,0.4), inset 1px 0 20px rgba(200,161,90,0.02)", xPercent: 102, rotate: 0 },
-  { num: "05", bg: "#FAEFE7", shadow: "inset 1px 0 0 rgba(255,255,255,0.4), inset 1px 0 20px rgba(200,161,90,0.02)", xPercent: 100, rotate: 0.5 },
-  { num: "06", bg: "#FFF8EF", shadow: "inset 1px 0 0 rgba(255,255,255,0.4), inset 1px 0 20px rgba(200,161,90,0.02)", xPercent: 105, rotate: 1 },
+  { num: "01", bg: "#FFF8EF", shadow: "inset 1px 0 0 rgba(255,255,255,0.4), inset -1px 0 20px rgba(200,161,90,0.02)", x: "-110vw", rotate: -1 },
+  { num: "02", bg: "#FFF6EE", shadow: "inset 1px 0 0 rgba(255,255,255,0.4), inset -1px 0 20px rgba(200,161,90,0.02)", x: "-110vw", rotate: -0.5 },
+  { num: "03", bg: "#FDF2EA", shadow: "inset 1px 0 0 rgba(255,255,255,0.4), inset -1px 0 20px rgba(200,161,90,0.02)", x: "-110vw", rotate: 0 },
+  { num: "04", bg: "#FFF9F3", shadow: "inset 1px 0 0 rgba(255,255,255,0.4), inset 1px 0 20px rgba(200,161,90,0.02)", x: "110vw", rotate: 0 },
+  { num: "05", bg: "#FAEFE7", shadow: "inset 1px 0 0 rgba(255,255,255,0.4), inset 1px 0 20px rgba(200,161,90,0.02)", x: "110vw", rotate: 0.5 },
+  { num: "06", bg: "#FFF8EF", shadow: "inset 1px 0 0 rgba(255,255,255,0.4), inset 1px 0 20px rgba(200,161,90,0.02)", x: "110vw", rotate: 1 },
 ];
 
 interface PaperRevealProps {
@@ -42,10 +42,10 @@ export default function PaperReveal({ onRevealComplete }: PaperRevealProps) {
         const delay = staggers[i] || 0;
 
         tl.to(el, {
-          xPercent: data.xPercent,
+          x: data.x,
           rotationZ: data.rotate,
           scaleY: 1.05, // Slight vertical stretch during movement
-          duration: 1.4,
+          duration: 1.6, // slightly increased duration for smoother, wider travel
           ease: "power3.inOut",
         }, delay);
       });
@@ -118,7 +118,7 @@ export default function PaperReveal({ onRevealComplete }: PaperRevealProps) {
                 {panel.num}
               </span>
               {isActive && (
-                <div className="w-[12px] h-[1px] bg-[#E68A99] mt-2 opacity-80" />
+                <div className="w-3 h-px bg-[#E68A99] mt-2 opacity-80" />
               )}
             </div>
           </div>

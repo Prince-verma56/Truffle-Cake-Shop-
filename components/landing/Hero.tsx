@@ -16,6 +16,8 @@ export default function Hero() {
   const descRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const reviewsRef = useRef<HTMLDivElement>(null);
+  const leftFlowerRef = useRef<HTMLImageElement>(null);
+  const rightFlowerRef = useRef<HTMLImageElement>(null);
 
   const [introDone, setIntroDone] = useState(!introConfig.enableCinematicIntro);
   const hasStartedHeroReveal = useRef(false);
@@ -76,10 +78,49 @@ export default function Hero() {
         { opacity: 0, y: 15 },
         { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" },
         1.8 // Starts at 6.8s
-      );
+      )
+      // FINAL REVEAL: Decorative Flowers
+      .fromTo(leftFlowerRef.current,
+        { opacity: 0, yPercent: 100, scale: 0.92, rotation: -4 },
+        { opacity: 1, yPercent: 0, scale: 1, rotation: 0, duration: 1.4, ease: "elastic.out(1, 0.65)" },
+        2.2 // Starts slightly after hero content finishes
+      )
+      .fromTo(rightFlowerRef.current,
+        { opacity: 0, yPercent: 100, scale: 0.92, rotation: 4 },
+        { opacity: 1, yPercent: 0, scale: 1, rotation: 0, duration: 1.4, ease: "elastic.out(1, 0.65)" },
+        2.32 // Slight stagger
+      )
+      // Start the floating animations just as the elastic bounce finishes
+      .add(() => {
+        floatTlLeft.play();
+        floatTlRight.play();
+      }, 3.7);
+
+    // CONTINUOUS FLOATING ANIMATION (Triggered independently of the main timeline)
+    const floatTlLeft = gsap.to(leftFlowerRef.current, {
+      y: -15,
+      rotation: 2,
+      duration: 4.5,
+      ease: "sine.inOut",
+      yoyo: true,
+      repeat: -1,
+      paused: true
+    });
+    
+    const floatTlRight = gsap.to(rightFlowerRef.current, {
+      y: -12,
+      rotation: -2,
+      duration: 3.8,
+      ease: "sine.inOut",
+      yoyo: true,
+      repeat: -1,
+      paused: true
+    });
 
     return () => {
       tlRef.current?.kill();
+      floatTlLeft.kill();
+      floatTlRight.kill();
     };
   }, []);
 
@@ -231,6 +272,36 @@ export default function Hero() {
         {/* Intentionally left empty to allow the video cake to breathe without decorative clutter */}
         
       </div>
+      
+      {/* ── FINAL DECORATIVE FOREGROUND (FLOWERS) ── */}
+      <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden" aria-hidden="true">
+        <img 
+          ref={leftFlowerRef}
+          src="/Images/Flowers/LeftLanding.png" 
+          alt=""
+          className="absolute bottom-0 left-0 opacity-0"
+          style={{
+            width: "clamp(180px, 25vw, 400px)", // Responsive sizing
+            height: "auto",
+            objectFit: "contain",
+            objectPosition: "bottom left"
+          }}
+        />
+        
+        <img 
+          ref={rightFlowerRef}
+          src="/Images/Flowers/RightLanding.png" 
+          alt=""
+          className="absolute bottom-0 right-0 opacity-0"
+          style={{
+            width: "clamp(180px, 25vw, 400px)", // Responsive sizing
+            height: "auto",
+            objectFit: "contain",
+            objectPosition: "bottom right"
+          }}
+        />
+      </div>
+
     </section>
   );
 }
