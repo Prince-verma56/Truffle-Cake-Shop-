@@ -26,13 +26,19 @@ export const metadata: Metadata = {
   description: "Made to be remembered.",
 };
 
+import LenisProvider from "@/components/providers/LenisProvider";
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
       className={`${fraunces.variable} ${manrope.variable} ${allura.variable} h-full antialiased font-manrope`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <LenisProvider>
+          {children}
+        </LenisProvider>
+      </body>
     </html>
   );
 }

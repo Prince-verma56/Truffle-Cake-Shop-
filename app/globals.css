@@ -149,6 +149,20 @@
   }
   html {
     @apply font-sans;
+    /* Prevent white flash before the cinematic intro paints */
+    background-color: #FFF8EF;
+  }
+
+  /* Cinematic intro panel optimisation */
+  [data-intro-panel] {
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+
+  /* Prevent horizontal overflow during intro */
+  body.intro-active {
+    overflow: hidden;
+    max-width: 100vw;
   }
 }
 

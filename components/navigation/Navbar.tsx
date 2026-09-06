@@ -1,43 +1,64 @@
 "use client";
 
-import { useState } from "react";
-import { motion, useScroll, useMotionValueEvent } from "motion/react";
+import { useState, useEffect, useRef } from "react";
+import { motion } from "motion/react";
 import Link from "next/link";
 import MobileMenu from "./MobileMenu";
 import { cn } from "@/lib/utils";
+import { introConfig } from "@/lib/introConfig";
 
 export default function Navbar() {
+  const [introDone, setIntroDone] = useState(!introConfig.enableCinematicIntro);
   const [isScrolled, setIsScrolled] = useState(false);
-  const { scrollY } = useScroll();
   const [hidden, setHidden] = useState(false);
+  const lastScrollY = useRef(0);
 
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    const previous = scrollY.getPrevious() ?? 0;
-    if (latest > previous && latest > 150) {
-      setHidden(true);
-    } else {
-      setHidden(false);
-    }
-    
-    if (latest > 50) {
-      setIsScrolled(true);
-    } else {
-      setIsScrolled(false);
-    }
-  });
+  // Use native scroll event — avoids the motion/react useScroll SSR hydration
+  // warning ("Target ref is defined but not hydrated").
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY;
+      const prev = lastScrollY.current;
+
+      setHidden(y > prev && y > 150);
+      setIsScrolled(y > 50);
+
+      lastScrollY.current = y;
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Listen for the Hero UI reveal event to trigger entrance animation
+  useEffect(() => {
+    if (introDone) return;
+    const handleHeroReveal = () => {
+      setIntroDone(true);
+    };
+    window.addEventListener("hero-ui-reveal", handleHeroReveal);
+    return () => window.removeEventListener("hero-ui-reveal", handleHeroReveal);
+  }, [introDone]);
+
+  // Determine current animation state
+  let navState = "visible";
+  if (!introDone) navState = "intro";
+  else if (hidden) navState = "hidden";
 
   return (
     <motion.header
+      initial={introConfig.enableCinematicIntro ? "intro" : "visible"}
       variants={{
-        visible: { y: 0 },
-        hidden: { y: "-100%" },
+        intro: { y: -20, opacity: 0 },
+        visible: { y: 0, opacity: 1 },
+        hidden: { y: "-100%", opacity: 1 },
       }}
-      animate={hidden ? "hidden" : "visible"}
-      transition={{ duration: 0.35, ease: "easeInOut" }}
+      animate={navState}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} // smooth out cubic bezier
       className={cn(
         "fixed top-0 inset-x-0 z-50 transition-all duration-300",
-        isScrolled 
-          ? "bg-cream/90 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.03)] h-20" 
+        isScrolled
+          ? "bg-cream/90 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.03)] h-20"
           : "bg-transparent h-28"
       )}
     >
@@ -47,7 +68,7 @@ export default function Navbar() {
             Truffle Cakes.
           </Link>
         </div>
-        
+
         <nav className="hidden md:flex flex-1 justify-center items-center gap-10 font-manrope text-sm font-medium">
           <Link href="#cakes" className="text-navy hover:text-gold transition-colors">Cakes</Link>
           <Link href="#menu" className="text-navy hover:text-gold transition-colors">Menu</Link>
@@ -56,7 +77,7 @@ export default function Navbar() {
         </nav>
 
         <div className="hidden md:flex flex-1 justify-end">
-          <Link 
+          <Link
             href="#order"
             className="btn-primary !py-3 !px-7 !text-sm"
           >
